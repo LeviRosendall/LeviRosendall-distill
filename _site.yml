@@ -13,4 +13,6 @@ navbar:
       href: project.html
     - text: "Map"
       href: USMAP.html
+    - text: "Map Code"
+      href: EtsyMap.html
 output: distill::distill_article
