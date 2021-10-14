@@ -9,7 +9,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 
 
-```{r, include=FALSE}
+```{r}
 library(readxl)
 library(tidyverse)
 library(zipcodeR)
@@ -23,7 +23,7 @@ FinalEtsy <- read_csv('~/STA 518/ETSY2021/FinalEtsy.csv')
 ```
 
 
-```{r Stateabbr, include=FALSE}
+```{r Stateabbr}
 State_Ind <- right_join(get_urbn_map(map = "states", sf = TRUE),
                           FinalEtsy,
                           by = c("state_abbv" = "Ship State"))
@@ -36,7 +36,7 @@ State_Ind_Year <- State_Ind %>%
 
 
 
-```{r, include=FALSE}
+```{r}
 
 
 AnimationDataTry <- FinalEtsy %>% 

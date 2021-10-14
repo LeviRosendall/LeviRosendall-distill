@@ -855,6 +855,7 @@ $(document).ready(function () {
 <a href="about.html">About</a>
 <a href="project.html">Project</a>
 <a href="USMAP.html">Map</a>
+<a href="EtsyMap.html">Map Code</a>
 <a href="javascript:void(0);" class="nav-toggle">&#9776;</a>
 </div>
 </nav>
@@ -890,6 +891,9 @@ $(document).ready(function () {
 <li>
   <a href="USMAP.html">Map</a>
 </li>
+<li>
+  <a href="EtsyMap.html">Map Code</a>
+</li>
       </ul>
     </div><!--/.nav-collapse -->
   </div><!--/.container -->
@@ -904,6 +908,134 @@ $(document).ready(function () {
 </div>
 
 
+<pre class="r"><code>library(readxl)
+library(tidyverse)</code></pre>
+<pre><code>## ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.1 ──</code></pre>
+<pre><code>## ✓ ggplot2 3.3.5     ✓ purrr   0.3.4
+## ✓ tibble  3.1.5     ✓ dplyr   1.0.7
+## ✓ tidyr   1.1.3     ✓ stringr 1.4.0
+## ✓ readr   1.4.0     ✓ forcats 0.5.1</code></pre>
+<pre><code>## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+## x dplyr::filter() masks stats::filter()
+## x dplyr::lag()    masks stats::lag()</code></pre>
+<pre class="r"><code>library(zipcodeR)
+library(urbnmapr)
+library(gganimate)
+library(sf)</code></pre>
+<pre><code>## Linking to GEOS 3.8.0, GDAL 3.0.4, PROJ 6.3.1</code></pre>
+<pre class="r"><code>library(transformr)</code></pre>
+<pre><code>## 
+## Attaching package: &#39;transformr&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:sf&#39;:
+## 
+##     st_normalize</code></pre>
+<pre class="r"><code>library(lubridate)</code></pre>
+<pre><code>## 
+## Attaching package: &#39;lubridate&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:base&#39;:
+## 
+##     date, intersect, setdiff, union</code></pre>
+<pre class="r"><code>library(plotly)</code></pre>
+<pre><code>## 
+## Attaching package: &#39;plotly&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:ggplot2&#39;:
+## 
+##     last_plot</code></pre>
+<pre><code>## The following object is masked from &#39;package:stats&#39;:
+## 
+##     filter</code></pre>
+<pre><code>## The following object is masked from &#39;package:graphics&#39;:
+## 
+##     layout</code></pre>
+<pre class="r"><code>FinalEtsy &lt;- read_csv(&#39;~/STA 518/ETSY2021/FinalEtsy.csv&#39;)</code></pre>
+<pre><code>## 
+## ── Column specification ────────────────────────────────────────────────────────
+## cols(
+##   .default = col_character(),
+##   `Order ID` = col_double(),
+##   `Number of Items` = col_double(),
+##   `Order Value` = col_double(),
+##   `Coupon Code` = col_logical(),
+##   `Coupon Details` = col_logical(),
+##   `Discount Amount` = col_double(),
+##   `Shipping Discount` = col_double(),
+##   Shipping = col_double(),
+##   `Sales Tax` = col_double(),
+##   `Order Total` = col_double(),
+##   Status = col_logical(),
+##   `Card Processing Fees` = col_double(),
+##   `Order Net` = col_double(),
+##   `Adjusted Order Total` = col_double(),
+##   `Adjusted Card Processing Fees` = col_double(),
+##   `Adjusted Net Order Amount` = col_double(),
+##   `InPerson Discount` = col_logical(),
+##   `InPerson Location` = col_logical()
+## )
+## ℹ Use `spec()` for the full column specifications.</code></pre>
+<pre class="r"><code>State_Ind &lt;- right_join(get_urbn_map(map = &quot;states&quot;, sf = TRUE),
+                          FinalEtsy,
+                          by = c(&quot;state_abbv&quot; = &quot;Ship State&quot;))</code></pre>
+<pre><code>## old-style crs object detected; please recreate object with a recent sf::st_crs()</code></pre>
+<pre class="r"><code>State_Ind_Year &lt;- State_Ind %&gt;% 
+  filter(`Ship Country`==&#39;United States&#39; &amp; `state_abbv` != &#39;PR&#39;) %&gt;% 
+  mutate(actualDate=as.Date(mdy(`Sale Date`))) %&gt;% 
+  mutate(day=actualDate-mdy(&#39;07-28-2021&#39;)) %&gt;% 
+  arrange(day)</code></pre>
+<pre class="r"><code>AnimationDataTry &lt;- FinalEtsy %&gt;% 
+  filter(`Ship Country`==&quot;United States&quot;) %&gt;% 
+  mutate(date=mdy(`Sale Date`)) %&gt;% 
+  arrange(date) %&gt;% 
+  mutate(state=`Ship State`) %&gt;% 
+  group_by(state, date) %&gt;% 
+  summarise(Total_Sold=sum(`Number of Items`), date) %&gt;% 
+  arrange(date)</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;state&#39;, &#39;date&#39;. You can override using the `.groups` argument.</code></pre>
+<pre class="r"><code>NoDup &lt;- AnimationDataTry %&gt;% distinct()
+
+stateListData &lt;- State_Ind_Year %&gt;% 
+  group_by(state_abbv) %&gt;% 
+  summarise(total=sum(`Number of Items`))
+
+stateList &lt;- stateListData$state_abbv
+
+statesOver=c()
+sellDay=c()
+start &lt;- as.Date(&quot;07-31-21&quot;,format=&quot;%m-%d-%y&quot;)
+end   &lt;- as.Date(&quot;10-08-21&quot;,format=&quot;%m-%d-%y&quot;)
+
+theDate &lt;- start
+theDate</code></pre>
+<pre><code>## [1] &quot;2021-07-31&quot;</code></pre>
+<pre class="r"><code>for(state in stateList){
+  while (theDate &lt;= end)
+  {
+    statesOver &lt;- c(statesOver, state)
+    sellDay &lt;- c(sellDay, as_date(theDate))
+    theDate &lt;- theDate + 1                    
+  }
+  theDate &lt;- start
+}
+sellDay &lt;- as.Date(as.POSIXct(sellDay*24*60*60, origin = &quot;1970-01-01&quot;, tz=&quot;UTC&quot;))
+
+emptyTable &lt;- data.frame(sellDay, statesOver)
+
+fullTable &lt;- left_join(emptyTable, NoDup, by=c(&quot;sellDay&quot;=&quot;date&quot;, &quot;statesOver&quot;=&quot;state&quot;))
+
+fullTable &lt;- fullTable %&gt;% 
+  mutate(items=ifelse(is.na(Total_Sold), 0,Total_Sold)) %&gt;% 
+  group_by(statesOver) %&gt;% 
+  summarise(sellDay, statesOver, items, cumulative = cumsum(items))</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;statesOver&#39;. You can override using the `.groups` argument.</code></pre>
+<pre class="r"><code>plotTable &lt;- fullTable %&gt;% 
+  mutate(numSold = ifelse(cumulative==0, 0,
+                    ifelse(cumulative&lt;5, 1,
+                    ifelse(cumulative&lt;10, 2,
+                    ifelse(cumulative&lt;20, 3,
+                    ifelse(cumulative&lt;50, 4,
+                    ifelse(cumulative&lt;100, 5,
+                    ifelse(cumulative&lt;200, 6, 7)))))))) %&gt;% 
+  mutate(logSold=ifelse(cumulative&gt;0, log(cumulative+1), 0)) %&gt;% 
+  mutate(day = (month(sellDay)*100+day(sellDay)) )</code></pre>
 <pre class="r"><code>USMAP &lt;- plotTable %&gt;% 
   plot_ly(
     type = &#39;choropleth&#39;,
