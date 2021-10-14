@@ -6,22 +6,10 @@ title: "Project"
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## R Markdown
+# Project Overview:
+From July 31 to October 8, I ran an ETSY shop selling BELIEVE signs from the Apple TV+ show 'Ted Lasso'. For my project I would like to not only map where I sent signs, but also do some analysis on the locations within the United States where I shipped. Something I am thinking about is how many signs were sent to (zipcode, county, state) vs the income of that place. The income data will come from US Census Data.
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
-```
-
-## Including Plots
-
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
-```
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+# Plan of Action:
+- Create an animated map of where I have shipped
+- Create tables/correlations between ship area vs income
+- Compile the above into a website that makes viewing my project results easy

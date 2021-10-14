@@ -27,8 +27,8 @@
       "path": "project.html",
       "title": "Project",
       "author": [],
-      "contents": "\nR Markdown\nThis is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see http://rmarkdown.rstudio.com.\nWhen you click the Knit button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:\n\n\nsummary(cars)\n\n\n     speed           dist       \n Min.   : 4.0   Min.   :  2.00  \n 1st Qu.:12.0   1st Qu.: 26.00  \n Median :15.0   Median : 36.00  \n Mean   :15.4   Mean   : 42.98  \n 3rd Qu.:19.0   3rd Qu.: 56.00  \n Max.   :25.0   Max.   :120.00  \n\nIncluding Plots\nYou can also embed plots, for example:\n\n\n\nNote that the echo = FALSE parameter was added to the code chunk to prevent printing of the R code that generated the plot.\n\n\n\n",
-      "last_modified": "2021-10-14T15:46:14+00:00"
+      "contents": "\nProject Overview:\nFrom July 31 to October 8, I ran an etsy shop selling BELIEVE signs from the Apple TV+ show ‘Ted Lasso’. For my project I would like to not only map where I sent signs, but also do some analysis on the locations within the United States where I shipped. Something I am thinking about is how many signs were sent to (zipcode, county, state) vs the income of that place. The income data will come from US Census Data.\nPlan of Action:\nCreate an animated map of where I have shipped\nCreate tables/correlations between ship area vs income\nCompile the above into a website that makes viewing my project results easy\n\n\n\n",
+      "last_modified": "2021-10-14T18:36:17+00:00"
     }
   ],
   "collections": []
