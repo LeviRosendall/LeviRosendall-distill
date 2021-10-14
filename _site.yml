@@ -11,4 +11,6 @@ navbar:
       href: about.html
     - text: "Project"
       href: project.html
+    - text: "Map"
+      href: USMAP.html
 output: distill::distill_article

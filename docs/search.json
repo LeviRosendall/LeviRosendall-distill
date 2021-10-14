@@ -6,7 +6,14 @@
       "description": "Some additional details about the website",
       "author": [],
       "contents": "\n\n\n\n",
-      "last_modified": "2021-10-11T22:35:35+00:00"
+      "last_modified": "2021-10-14T15:46:07+00:00"
+    },
+    {
+      "path": "EtsyMap.html",
+      "title": "EtsyMap",
+      "author": [],
+      "contents": "\n\n\n\n\n\n\n\n\nLevi\n\n\nHome\nAbout\nProject\nMap\n☰\n\n\n  \n    \n      \n        \n        \n        \n      \n      \n    \n    \n      \n  Home\n\n\n  About\n\n\n  Project\n\n\n  Map\n\n      \n  \n\n\n\n\n\n\nEtsyMap\n\n\n\n\nUSMAP <- plotTable %>% \n  plot_ly(\n    type = 'choropleth',\n    locations= ~statesOver,\n    locationmode = 'USA-states' , \n    colorscale='tempo', z=~logSold,\n    zmin=0, zmax=6,\n    text=~cumulative,\n    hoverinfo='text',\n    showscale=FALSE,\n    frame=~day) %>% \n  layout(geo=list( scope = 'usa' )) \nlibrary(htmlwidgets)\nsaveWidget(USMAP, \"USMAP.html\")\n\n\n\n\n\n\n\n\n\n\n\n\n// add bootstrap table styles to pandoc tables\nfunction bootstrapStylePandocTables() {\n  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');\n}\n$(document).ready(function () {\n  bootstrapStylePandocTables();\n});\n\n\n\n$(document).ready(function () {\n  window.buildTabsets(\"TOC\");\n});\n\n$(document).ready(function () {\n  $('.tabset-dropdown > .nav-tabs > li').click(function () {\n    $(this).parent().toggleClass('nav-tabs-open');\n  });\n});\n\n  (function () {\n    var script = document.createElement(\"script\");\n    script.type = \"text/javascript\";\n    script.src  = \"https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML\";\n    document.getElementsByTagName(\"head\")[0].appendChild(script);\n  })();\n",
+      "last_modified": "2021-10-14T15:46:13+00:00"
     },
     {
       "path": "index.html",
@@ -14,14 +21,14 @@
       "description": "Welcome to the website. I hope you enjoy it!\n",
       "author": [],
       "contents": "\n\n\n\n",
-      "last_modified": "2021-10-11T22:35:36+00:00"
+      "last_modified": "2021-10-14T15:46:13+00:00"
     },
     {
       "path": "project.html",
       "title": "Project",
       "author": [],
       "contents": "\nR Markdown\nThis is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see http://rmarkdown.rstudio.com.\nWhen you click the Knit button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:\n\n\nsummary(cars)\n\n\n     speed           dist       \n Min.   : 4.0   Min.   :  2.00  \n 1st Qu.:12.0   1st Qu.: 26.00  \n Median :15.0   Median : 36.00  \n Mean   :15.4   Mean   : 42.98  \n 3rd Qu.:19.0   3rd Qu.: 56.00  \n Max.   :25.0   Max.   :120.00  \n\nIncluding Plots\nYou can also embed plots, for example:\n\n\n\nNote that the echo = FALSE parameter was added to the code chunk to prevent printing of the R code that generated the plot.\n\n\n\n",
-      "last_modified": "2021-10-11T22:35:36+00:00"
+      "last_modified": "2021-10-14T15:46:14+00:00"
     }
   ],
   "collections": []

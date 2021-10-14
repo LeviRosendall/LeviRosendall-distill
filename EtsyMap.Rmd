@@ -1,0 +1,122 @@
+---
+title: "EtsyMap"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+```{r, include=FALSE}
+library(readxl)
+library(tidyverse)
+library(zipcodeR)
+library(urbnmapr)
+library(gganimate)
+library(sf)
+library(transformr)
+library(lubridate)
+library(plotly)
+FinalEtsy <- read_csv('~/STA 518/ETSY2021/FinalEtsy.csv')
+```
+
+
+```{r Stateabbr, include=FALSE}
+State_Ind <- right_join(get_urbn_map(map = "states", sf = TRUE),
+                          FinalEtsy,
+                          by = c("state_abbv" = "Ship State"))
+State_Ind_Year <- State_Ind %>% 
+  filter(`Ship Country`=='United States' & `state_abbv` != 'PR') %>% 
+  mutate(actualDate=as.Date(mdy(`Sale Date`))) %>% 
+  mutate(day=actualDate-mdy('07-28-2021')) %>% 
+  arrange(day)
+```
+
+
+
+```{r, include=FALSE}
+
+
+AnimationDataTry <- FinalEtsy %>% 
+  filter(`Ship Country`=="United States") %>% 
+  mutate(date=mdy(`Sale Date`)) %>% 
+  arrange(date) %>% 
+  mutate(state=`Ship State`) %>% 
+  group_by(state, date) %>% 
+  summarise(Total_Sold=sum(`Number of Items`), date) %>% 
+  arrange(date)
+NoDup <- AnimationDataTry %>% distinct()
+
+stateListData <- State_Ind_Year %>% 
+  group_by(state_abbv) %>% 
+  summarise(total=sum(`Number of Items`))
+
+stateList <- stateListData$state_abbv
+
+statesOver=c()
+sellDay=c()
+start <- as.Date("07-31-21",format="%m-%d-%y")
+end   <- as.Date("10-08-21",format="%m-%d-%y")
+
+theDate <- start
+theDate
+for(state in stateList){
+  while (theDate <= end)
+  {
+    statesOver <- c(statesOver, state)
+    sellDay <- c(sellDay, as_date(theDate))
+    theDate <- theDate + 1                    
+  }
+  theDate <- start
+}
+sellDay <- as.Date(as.POSIXct(sellDay*24*60*60, origin = "1970-01-01", tz="UTC"))
+
+emptyTable <- data.frame(sellDay, statesOver)
+
+fullTable <- left_join(emptyTable, NoDup, by=c("sellDay"="date", "statesOver"="state"))
+
+fullTable <- fullTable %>% 
+  mutate(items=ifelse(is.na(Total_Sold), 0,Total_Sold)) %>% 
+  group_by(statesOver) %>% 
+  summarise(sellDay, statesOver, items, cumulative = cumsum(items))
+
+plotTable <- fullTable %>% 
+  mutate(numSold = ifelse(cumulative==0, 0,
+                    ifelse(cumulative<5, 1,
+                    ifelse(cumulative<10, 2,
+                    ifelse(cumulative<20, 3,
+                    ifelse(cumulative<50, 4,
+                    ifelse(cumulative<100, 5,
+                    ifelse(cumulative<200, 6, 7)))))))) %>% 
+  mutate(logSold=ifelse(cumulative>0, log(cumulative+1), 0)) %>% 
+  mutate(day = (month(sellDay)*100+day(sellDay)) )
+
+
+
+
+```
+
+```{r}
+USMAP <- plotTable %>% 
+  plot_ly(
+    type = 'choropleth',
+    locations= ~statesOver,
+    locationmode = 'USA-states' , 
+    colorscale='tempo', z=~logSold,
+    zmin=0, zmax=6,
+    text=~cumulative,
+    hoverinfo='text',
+    showscale=FALSE,
+    frame=~day) %>% 
+  layout(geo=list( scope = 'usa' )) 
+library(htmlwidgets)
+saveWidget(USMAP, "USMAP.html")
+```
+
+
+
+
+
+
