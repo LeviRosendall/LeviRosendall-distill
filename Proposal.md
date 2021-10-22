@@ -10,3 +10,5 @@ Create tables/correlations between ship area vs income
 Compile the above into a website that makes viewing my project results easy
 
 Comments:
+Maybe you could also look at where signs sold first versus where they tend to sell now? So see if a portion of the US was more into the show before a different area?
+This is a really neat project though and I'm excited to see what you find out (and that animated map is gonna be so cool)!
