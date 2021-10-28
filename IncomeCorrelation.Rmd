@@ -1,0 +1,70 @@
+---
+title: "IncomeCorrelation"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r}
+library(readxl)
+library(tidyverse)
+CensusData <- read_excel('~/STA 518/ETSY2021/Census Data.xlsx')
+FinalEtsy <- read_csv('~/STA 518/ETSY2021/FinalEtsy.csv')
+```
+
+```{r}
+#Creates a dataset of only US orders
+US_ETSY2021 <- FinalEtsy %>% 
+  filter(`Ship Country`=="United States")
+```
+
+```{r}
+#Gets median income by state
+library(tidycensus)
+#census_api_key("74dffda41385b000bbc7c51fcc2b32468769dce9", install=TRUE)
+readRenviron("~/.Renviron")
+stateIncome <- get_acs(geography = "state", 
+              variables = c(medincome = "B19013_001"), 
+              year = 2018)
+
+statePop <- get_acs(geography = "state", 
+              variables = c(population = "B01003_001"), 
+              year = 2018)
+
+v17 <- load_variables(2018, "acs5", cache = TRUE)
+
+#View(v17)
+```
+
+```{r joinSalary}
+CumulUS <- US_ETSY2021 %>% 
+  group_by(`Ship State`) %>% 
+  summarise(soldToState=sum(`Number of Items`))
+
+stateListAbbv <- get_urbn_map(map = "states") %>% 
+  select(state_abbv, state_name) %>% 
+  distinct() %>% 
+  rbind(c("PR", "Puerto Rico"))
+
+CumulUS <- left_join(CumulUS, stateListAbbv, by=c("Ship State"="state_abbv"))
+
+CumulUS <- left_join(CumulUS, stateIncome, by=c("state_name"="NAME")) %>% 
+  select(soldToState, state_name, medincome=estimate)
+
+CumulUS <- left_join(CumulUS, statePop, by=c("state_name"="NAME")) %>% 
+  select(soldToState, state_name, medincome, population=estimate) %>% 
+  mutate(soldPerCapita=1000*soldToState/population)
+```
+
+```{r correlationTest}
+cor.test(CumulUS$medincome, CumulUS$soldPerCapita, method=c("pearson", "kendall", "spearman"))
+```
+

@@ -15,4 +15,6 @@ navbar:
       href: USMAP.html
     - text: "Map Code"
       href: EtsyMap.html
+    - text: "Income Correlation"
+      href: IncomeCorrelation.html
 output: distill::distill_article

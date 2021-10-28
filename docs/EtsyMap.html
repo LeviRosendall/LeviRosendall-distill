@@ -1049,7 +1049,10 @@ fullTable &lt;- fullTable %&gt;%
     frame=~day) %&gt;% 
   layout(geo=list( scope = &#39;usa&#39; )) 
 library(htmlwidgets)
-saveWidget(USMAP, &quot;USMAP.html&quot;)</code></pre>
+saveWidget(USMAP, &quot;USMAP.html&quot;, selfcontained = F, libdir = &quot;lib&quot;)</code></pre>
+<p>#This map is a gif. If you would like to view an interactive version, go to the “Map” tab.</p>
+<pre class="r"><code>knitr::include_graphics(&quot;USCumul.gif&quot;)</code></pre>
+<p><img src="USCumul.gif" /><!-- --></p>
 
 <!--radix_placeholder_site_after_body-->
 <!--/radix_placeholder_site_after_body-->

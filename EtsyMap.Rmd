@@ -112,7 +112,12 @@ USMAP <- plotTable %>%
     frame=~day) %>% 
   layout(geo=list( scope = 'usa' )) 
 library(htmlwidgets)
-saveWidget(USMAP, "USMAP.html")
+saveWidget(USMAP, "USMAP.html", selfcontained = F, libdir = "lib")
+```
+
+#This map is a gif. If you would like to view an interactive version, go to the "Map" tab.
+```{r}
+knitr::include_graphics("USCumul.gif")
 ```
 
 
