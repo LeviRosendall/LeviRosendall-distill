@@ -11,7 +11,7 @@
 
 
 
-<title>EtsyMap</title>
+<title>IncomeCorrelation</title>
 
 <!--radix_placeholder_navigation_in_header-->
 <meta name="distill:offset" content=""/>
@@ -907,51 +907,19 @@ $(document).ready(function () {
 
 
 
-<h1 class="title toc-ignore">EtsyMap</h1>
+<h1 class="title toc-ignore">IncomeCorrelation</h1>
 
 </div>
 
 
+<div id="r-markdown" class="section level2">
+<h2>R Markdown</h2>
+<p>This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <a href="http://rmarkdown.rstudio.com" class="uri">http://rmarkdown.rstudio.com</a>.</p>
+<p>When you click the <strong>Knit</strong> button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:</p>
 <pre class="r"><code>library(readxl)
-library(tidyverse)</code></pre>
-<pre><code>## ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.1 ──</code></pre>
-<pre><code>## ✓ ggplot2 3.3.5     ✓ purrr   0.3.4
-## ✓ tibble  3.1.5     ✓ dplyr   1.0.7
-## ✓ tidyr   1.1.3     ✓ stringr 1.4.0
-## ✓ readr   1.4.0     ✓ forcats 0.5.1</code></pre>
-<pre><code>## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
-## x dplyr::filter() masks stats::filter()
-## x dplyr::lag()    masks stats::lag()</code></pre>
-<pre class="r"><code>library(zipcodeR)
-library(urbnmapr)
-library(gganimate)
-library(sf)</code></pre>
-<pre><code>## Linking to GEOS 3.8.0, GDAL 3.0.4, PROJ 6.3.1</code></pre>
-<pre class="r"><code>library(transformr)</code></pre>
-<pre><code>## 
-## Attaching package: &#39;transformr&#39;</code></pre>
-<pre><code>## The following object is masked from &#39;package:sf&#39;:
-## 
-##     st_normalize</code></pre>
-<pre class="r"><code>library(lubridate)</code></pre>
-<pre><code>## 
-## Attaching package: &#39;lubridate&#39;</code></pre>
-<pre><code>## The following objects are masked from &#39;package:base&#39;:
-## 
-##     date, intersect, setdiff, union</code></pre>
-<pre class="r"><code>library(plotly)</code></pre>
-<pre><code>## 
-## Attaching package: &#39;plotly&#39;</code></pre>
-<pre><code>## The following object is masked from &#39;package:ggplot2&#39;:
-## 
-##     last_plot</code></pre>
-<pre><code>## The following object is masked from &#39;package:stats&#39;:
-## 
-##     filter</code></pre>
-<pre><code>## The following object is masked from &#39;package:graphics&#39;:
-## 
-##     layout</code></pre>
-<pre class="r"><code>FinalEtsy &lt;- read_csv(&#39;~/STA 518/ETSY2021/FinalEtsy.csv&#39;)</code></pre>
+library(tidyverse)
+CensusData &lt;- read_excel(&#39;~/STA 518/ETSY2021/Census Data.xlsx&#39;)
+FinalEtsy &lt;- read_csv(&#39;~/STA 518/ETSY2021/FinalEtsy.csv&#39;)</code></pre>
 <pre><code>## 
 ## ── Column specification ────────────────────────────────────────────────────────
 ## cols(
@@ -976,87 +944,54 @@ library(sf)</code></pre>
 ##   `InPerson Location` = col_logical()
 ## )
 ## ℹ Use `spec()` for the full column specifications.</code></pre>
-<pre class="r"><code>State_Ind &lt;- right_join(get_urbn_map(map = &quot;states&quot;, sf = TRUE),
-                          FinalEtsy,
-                          by = c(&quot;state_abbv&quot; = &quot;Ship State&quot;))</code></pre>
-<pre><code>## old-style crs object detected; please recreate object with a recent sf::st_crs()</code></pre>
-<pre class="r"><code>State_Ind_Year &lt;- State_Ind %&gt;% 
-  filter(`Ship Country`==&#39;United States&#39; &amp; `state_abbv` != &#39;PR&#39;) %&gt;% 
-  mutate(actualDate=as.Date(mdy(`Sale Date`))) %&gt;% 
-  mutate(day=actualDate-mdy(&#39;07-28-2021&#39;)) %&gt;% 
-  arrange(day)</code></pre>
-<pre class="r"><code>AnimationDataTry &lt;- FinalEtsy %&gt;% 
-  filter(`Ship Country`==&quot;United States&quot;) %&gt;% 
-  mutate(date=mdy(`Sale Date`)) %&gt;% 
-  arrange(date) %&gt;% 
-  mutate(state=`Ship State`) %&gt;% 
-  group_by(state, date) %&gt;% 
-  summarise(Total_Sold=sum(`Number of Items`), date) %&gt;% 
-  arrange(date)</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;state&#39;, &#39;date&#39;. You can override using the `.groups` argument.</code></pre>
-<pre class="r"><code>NoDup &lt;- AnimationDataTry %&gt;% distinct()
+<pre class="r"><code>#Creates a dataset of only US orders
+US_ETSY2021 &lt;- FinalEtsy %&gt;% 
+  filter(`Ship Country`==&quot;United States&quot;)</code></pre>
+<pre class="r"><code>#Gets median income by state
+library(tidycensus)
+#census_api_key(&quot;74dffda41385b000bbc7c51fcc2b32468769dce9&quot;, install=TRUE)
+readRenviron(&quot;~/.Renviron&quot;)
+stateIncome &lt;- get_acs(geography = &quot;state&quot;, 
+              variables = c(medincome = &quot;B19013_001&quot;), 
+              year = 2018)</code></pre>
+<pre><code>## Getting data from the 2014-2018 5-year ACS</code></pre>
+<pre class="r"><code>statePop &lt;- get_acs(geography = &quot;state&quot;, 
+              variables = c(population = &quot;B01003_001&quot;), 
+              year = 2018)</code></pre>
+<pre><code>## Getting data from the 2014-2018 5-year ACS</code></pre>
+<pre class="r"><code>v17 &lt;- load_variables(2018, &quot;acs5&quot;, cache = TRUE)
 
-stateListData &lt;- State_Ind_Year %&gt;% 
-  group_by(state_abbv) %&gt;% 
-  summarise(total=sum(`Number of Items`))
+#View(v17)</code></pre>
+<pre class="r"><code>CumulUS &lt;- US_ETSY2021 %&gt;% 
+  group_by(`Ship State`) %&gt;% 
+  summarise(soldToState=sum(`Number of Items`))
 
-stateList &lt;- stateListData$state_abbv
+stateListAbbv &lt;- get_urbn_map(map = &quot;states&quot;) %&gt;% 
+  select(state_abbv, state_name) %&gt;% 
+  distinct() %&gt;% 
+  rbind(c(&quot;PR&quot;, &quot;Puerto Rico&quot;))
 
-statesOver=c()
-sellDay=c()
-start &lt;- as.Date(&quot;07-31-21&quot;,format=&quot;%m-%d-%y&quot;)
-end   &lt;- as.Date(&quot;10-08-21&quot;,format=&quot;%m-%d-%y&quot;)
+CumulUS &lt;- left_join(CumulUS, stateListAbbv, by=c(&quot;Ship State&quot;=&quot;state_abbv&quot;))
 
-theDate &lt;- start
-theDate</code></pre>
-<pre><code>## [1] &quot;2021-07-31&quot;</code></pre>
-<pre class="r"><code>for(state in stateList){
-  while (theDate &lt;= end)
-  {
-    statesOver &lt;- c(statesOver, state)
-    sellDay &lt;- c(sellDay, as_date(theDate))
-    theDate &lt;- theDate + 1                    
-  }
-  theDate &lt;- start
-}
-sellDay &lt;- as.Date(as.POSIXct(sellDay*24*60*60, origin = &quot;1970-01-01&quot;, tz=&quot;UTC&quot;))
+CumulUS &lt;- left_join(CumulUS, stateIncome, by=c(&quot;state_name&quot;=&quot;NAME&quot;)) %&gt;% 
+  select(soldToState, state_name, medincome=estimate)
 
-emptyTable &lt;- data.frame(sellDay, statesOver)
-
-fullTable &lt;- left_join(emptyTable, NoDup, by=c(&quot;sellDay&quot;=&quot;date&quot;, &quot;statesOver&quot;=&quot;state&quot;))
-
-fullTable &lt;- fullTable %&gt;% 
-  mutate(items=ifelse(is.na(Total_Sold), 0,Total_Sold)) %&gt;% 
-  group_by(statesOver) %&gt;% 
-  summarise(sellDay, statesOver, items, cumulative = cumsum(items))</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;statesOver&#39;. You can override using the `.groups` argument.</code></pre>
-<pre class="r"><code>plotTable &lt;- fullTable %&gt;% 
-  mutate(numSold = ifelse(cumulative==0, 0,
-                    ifelse(cumulative&lt;5, 1,
-                    ifelse(cumulative&lt;10, 2,
-                    ifelse(cumulative&lt;20, 3,
-                    ifelse(cumulative&lt;50, 4,
-                    ifelse(cumulative&lt;100, 5,
-                    ifelse(cumulative&lt;200, 6, 7)))))))) %&gt;% 
-  mutate(logSold=ifelse(cumulative&gt;0, log(cumulative+1), 0)) %&gt;% 
-  mutate(day = (month(sellDay)*100+day(sellDay)) )</code></pre>
-<pre class="r"><code>USMAP &lt;- plotTable %&gt;% 
-  plot_ly(
-    type = &#39;choropleth&#39;,
-    locations= ~statesOver,
-    locationmode = &#39;USA-states&#39; , 
-    colorscale=&#39;tempo&#39;, z=~logSold,
-    zmin=0, zmax=6,
-    text=~cumulative,
-    hoverinfo=&#39;text&#39;,
-    showscale=FALSE,
-    frame=~day) %&gt;% 
-  layout(geo=list( scope = &#39;usa&#39; )) 
-library(htmlwidgets)
-saveWidget(USMAP, &quot;USMAP.html&quot;, selfcontained = F, libdir = &quot;lib&quot;)</code></pre>
-<p>#This map is a gif. If you would like to view an interactive version, go to the “Map” tab.</p>
-<pre class="r"><code>knitr::include_graphics(&quot;USCumul.gif&quot;)</code></pre>
-<p><img src="USCumul.gif" /><!-- --></p>
+CumulUS &lt;- left_join(CumulUS, statePop, by=c(&quot;state_name&quot;=&quot;NAME&quot;)) %&gt;% 
+  select(soldToState, state_name, medincome, population=estimate) %&gt;% 
+  mutate(soldPerCapita=1000*soldToState/population)</code></pre>
+<pre class="r"><code>cor.test(CumulUS$medincome, CumulUS$soldPerCapita, method=c(&quot;pearson&quot;, &quot;kendall&quot;, &quot;spearman&quot;))</code></pre>
+<pre><code>## 
+##  Pearson&#39;s product-moment correlation
+## 
+## data:  CumulUS$medincome and CumulUS$soldPerCapita
+## t = 4.4474, df = 50, p-value = 4.854e-05
+## alternative hypothesis: true correlation is not equal to 0
+## 95 percent confidence interval:
+##  0.3036150 0.7031413
+## sample estimates:
+##       cor 
+## 0.5324023</code></pre>
+</div>
 
 <!--radix_placeholder_site_after_body-->
 <!--/radix_placeholder_site_after_body-->
