@@ -10,6 +10,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 
 ```{r}
+#installing all of the packages needed for this code to run. Much of it was added as needed.
 library(readxl)
 library(tidyverse)
 library(zipcodeR)
@@ -24,9 +25,14 @@ FinalEtsy <- read_csv('~/STA 518/ETSY2021/FinalEtsy.csv')
 
 
 ```{r Stateabbr}
+#Using urbnmapr to get the geometry of states added to this dataset, matched using state_abbv
 State_Ind <- right_join(get_urbn_map(map = "states", sf = TRUE),
                           FinalEtsy,
                           by = c("state_abbv" = "Ship State"))
+
+#filtering all non-US orders and Puerto Rico orders out of the dataset
+#changing date to be a date, not char
+#creating a numeric variable called day that is days since start that the order was placed, and arranging the data by day
 State_Ind_Year <- State_Ind %>% 
   filter(`Ship Country`=='United States' & `state_abbv` != 'PR') %>% 
   mutate(actualDate=as.Date(mdy(`Sale Date`))) %>% 
@@ -37,8 +43,7 @@ State_Ind_Year <- State_Ind %>%
 
 
 ```{r}
-
-
+#
 AnimationDataTry <- FinalEtsy %>% 
   filter(`Ship Country`=="United States") %>% 
   mutate(date=mdy(`Sale Date`)) %>% 
