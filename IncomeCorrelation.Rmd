@@ -16,6 +16,7 @@ When you click the **Knit** button a document will be generated that includes bo
 ```{r}
 library(readxl)
 library(tidyverse)
+library(urbnmapr)
 CensusData <- read_excel('~/STA 518/ETSY2021/Census Data.xlsx')
 FinalEtsy <- read_csv('~/STA 518/ETSY2021/FinalEtsy.csv')
 ```
@@ -65,6 +66,13 @@ CumulUS <- left_join(CumulUS, statePop, by=c("state_name"="NAME")) %>%
 ```
 
 ```{r correlationTest}
+CumulUS %>% 
+  ggplot(mapping=aes(x=medincome, y=soldPerCapita)) + 
+  geom_point(color="blue")+
+  geom_quantile(color="black")+
+  labs(x="State Median Income($)", y="Signs Sold Per 1000 Capita")+
+  theme(panel.background = element_rect(fill="#FFFFE0"),
+        panel.grid.major = element_line(color="grey"))
 cor.test(CumulUS$medincome, CumulUS$soldPerCapita, method=c("pearson", "kendall", "spearman"))
 ```
 

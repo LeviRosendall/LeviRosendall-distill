@@ -918,6 +918,7 @@ $(document).ready(function () {
 <p>When you click the <strong>Knit</strong> button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:</p>
 <pre class="r"><code>library(readxl)
 library(tidyverse)
+library(urbnmapr)
 CensusData &lt;- read_excel(&#39;~/STA 518/ETSY2021/Census Data.xlsx&#39;)
 FinalEtsy &lt;- read_csv(&#39;~/STA 518/ETSY2021/FinalEtsy.csv&#39;)</code></pre>
 <pre><code>## 
@@ -979,6 +980,15 @@ CumulUS &lt;- left_join(CumulUS, stateIncome, by=c(&quot;state_name&quot;=&quot;
 CumulUS &lt;- left_join(CumulUS, statePop, by=c(&quot;state_name&quot;=&quot;NAME&quot;)) %&gt;% 
   select(soldToState, state_name, medincome, population=estimate) %&gt;% 
   mutate(soldPerCapita=1000*soldToState/population)</code></pre>
+<pre class="r"><code>CumulUS %&gt;% 
+  ggplot(mapping=aes(x=medincome, y=soldPerCapita)) + 
+  geom_point(color=&quot;blue&quot;)+
+  geom_quantile(color=&quot;black&quot;)+
+  labs(x=&quot;State Median Income($)&quot;, y=&quot;Signs Sold Per 1000 Capita&quot;)+
+  theme(panel.background = element_rect(fill=&quot;#FFFFE0&quot;),
+        panel.grid.major = element_line(color=&quot;grey&quot;))</code></pre>
+<pre><code>## Smoothing formula not specified. Using: y ~ x</code></pre>
+<p><img src="IncomeCorrelation_files/figure-html/correlationTest-1.png" width="672" /></p>
 <pre class="r"><code>cor.test(CumulUS$medincome, CumulUS$soldPerCapita, method=c(&quot;pearson&quot;, &quot;kendall&quot;, &quot;spearman&quot;))</code></pre>
 <pre><code>## 
 ##  Pearson&#39;s product-moment correlation

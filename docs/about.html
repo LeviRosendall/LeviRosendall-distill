@@ -86,29 +86,29 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
 </style>
 
   <!--radix_placeholder_meta_tags-->
-  <title>Levi: About this site</title>
+  <title>Levi: Learning Objectives</title>
 
-  <meta property="description" itemprop="description" content="Some additional details about the website"/>
+  <meta property="description" itemprop="description" content="How this project meets the learning objectives"/>
 
 
 
   <!--  https://developers.facebook.com/docs/sharing/webmasters#markup -->
-  <meta property="og:title" content="Levi: About this site"/>
+  <meta property="og:title" content="Levi: Learning Objectives"/>
   <meta property="og:type" content="article"/>
-  <meta property="og:description" content="Some additional details about the website"/>
+  <meta property="og:description" content="How this project meets the learning objectives"/>
   <meta property="og:locale" content="en_US"/>
   <meta property="og:site_name" content="Levi"/>
 
   <!--  https://dev.twitter.com/cards/types/summary -->
   <meta property="twitter:card" content="summary"/>
-  <meta property="twitter:title" content="Levi: About this site"/>
-  <meta property="twitter:description" content="Some additional details about the website"/>
+  <meta property="twitter:title" content="Levi: Learning Objectives"/>
+  <meta property="twitter:description" content="How this project meets the learning objectives"/>
 
   <!--/radix_placeholder_meta_tags-->
   <!--radix_placeholder_rmarkdown_metadata-->
 
   <script type="text/json" id="radix-rmarkdown-metadata">
-  {"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["title","description"]}},"value":[{"type":"character","attributes":{},"value":["About this site"]},{"type":"character","attributes":{},"value":["Some additional details about the website"]}]}
+  {"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["title","description"]}},"value":[{"type":"character","attributes":{},"value":["Learning Objectives"]},{"type":"character","attributes":{},"value":["How this project meets the learning objectives"]}]}
   </script>
   <!--/radix_placeholder_rmarkdown_metadata-->
   <!--radix_placeholder_navigation_in_header-->
@@ -2053,7 +2053,7 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
 <!--radix_placeholder_front_matter-->
 
 <script id="distill-front-matter" type="text/json">
-{"title":"About this site","description":"Some additional details about the website","authors":[]}
+{"title":"Learning Objectives","description":"How this project meets the learning objectives","authors":[]}
 </script>
 
 <!--/radix_placeholder_front_matter-->
@@ -2079,15 +2079,151 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
 <!--/radix_placeholder_site_before_body-->
 
 <div class="d-title">
-<h1>About this site</h1>
+<h1>Learning Objectives</h1>
 <!--radix_placeholder_categories-->
 <!--/radix_placeholder_categories-->
-<p><p>Some additional details about the website</p></p>
+<p><p>How this project meets the learning objectives</p></p>
 </div>
 
 
 <div class="d-article">
-<div class="sourceCode" id="cb1"><pre class="sourceCode r distill-force-highlighting-css"><code class="sourceCode r"></code></pre></div>
+<h1 id="import-manage-and-clean-data">Import, manage, and clean data</h1>
+<p>This project imports data from several sources. The first comes from the .csv file that was downloaded from Etsy. The code for that is</p>
+<blockquote>
+<pre><code>
+FinalEtsy &lt;- read_csv(&#39;~/STA 518/ETSY2021/FinalEtsy.csv).</code></pre>
+</blockquote>
+<p>The second way that data is inputted in this project is using the {tidycensus} package.</p>
+<blockquote>
+<pre><code>
+library(tidycensus)
+readRenviron(&quot;~/.Renviron&quot;)
+stateIncome &lt;- get_acs(geography = &quot;state&quot;, 
+              variables = c(medincome = &quot;B19013_001&quot;), 
+              year = 2018)
+
+statePop &lt;- get_acs(geography = &quot;state&quot;, 
+              variables = c(population = &quot;B01003_001&quot;), 
+              year = 2018)</code></pre>
+</blockquote>
+<p>The original Etsy dataset came with each observation being one sale, which made mapping it a challenge. A large amount of data manipulation went into creating a cumulative sale map. I started by creating an “empty” data frame, including a row for each day and state.</p>
+<blockquote>
+<pre><code>
+statesOver=c()
+sellDay=c()
+start &lt;- as.Date(&quot;07-31-21&quot;,format=&quot;%m-%d-%y&quot;)
+end   &lt;- as.Date(&quot;10-08-21&quot;,format=&quot;%m-%d-%y&quot;)
+
+theDate &lt;- start
+theDate
+for(state in stateList){
+  while (theDate &lt;= end)
+  {
+    statesOver &lt;- c(statesOver, state)
+    sellDay &lt;- c(sellDay, as_date(theDate))
+    theDate &lt;- theDate + 1                    
+  }
+  theDate &lt;- start
+}
+sellDay &lt;- as.Date(as.POSIXct(sellDay*24*60*60, origin = &quot;1970-01-01&quot;, tz=&quot;UTC&quot;))
+
+emptyTable &lt;- data.frame(sellDay, statesOver)</code></pre>
+</blockquote>
+<p>This allowed me to left_join my edited Etsy table called NoDup, which consisted of a sum of signs sold to each state on each given day. For example, if there were 3 orders to Oregon and 1 order to Michigan on August 15, NoDup had two rows for August 15, one for each state. This is different from the original file which would have had 4 rows for that date.</p>
+<blockquote>
+<pre><code>
+fullTable &lt;- left_join(emptyTable, NoDup, by=c(&quot;sellDay&quot;=&quot;date&quot;, &quot;statesOver&quot;=&quot;state&quot;))</code></pre>
+</blockquote>
+<p>The data table fullTable then was changed with a cumulative sum, so each state sign total was filled in. A new data frame called plotTable was then created with several different way to plot the cumulative total, and logSold was decided on.</p>
+<blockquote>
+<pre><code>
+plotTable &lt;- fullTable %&gt;% 
+  mutate(numSold = ifelse(cumulative==0, 0,
+                    ifelse(cumulative&lt;5, 1,
+                    ifelse(cumulative&lt;10, 2,
+                    ifelse(cumulative&lt;20, 3,
+                    ifelse(cumulative&lt;50, 4,
+                    ifelse(cumulative&lt;100, 5,
+                    ifelse(cumulative&lt;200, 6, 7)))))))) %&gt;% 
+  mutate(logSold=ifelse(cumulative&gt;0, log(cumulative+1), 0)) %&gt;% 
+  mutate(day = (month(sellDay)*100+day(sellDay)) )</code></pre>
+</blockquote>
+<h1 id="create-graphical-displays-and-numerical-summaries-of-data-for-exploratory-analysis-and-presentations.">Create graphical displays and numerical summaries of data for exploratory analysis and presentations.</h1>
+<p>The cumulative sales map was created two ways, gif and html products. The code for the gif is</p>
+<blockquote>
+<pre><code>
+#creates a cumulative gif
+gifAnim &lt;- right_join(get_urbn_map(map = &quot;states&quot;, sf = TRUE),
+                          plotTable,
+                          by = c(&quot;state_abbv&quot; = &quot;statesOver&quot;))
+gifAnim &lt;- gifAnim %&gt;% 
+  ggplot() +
+  geom_sf(aes(fill = as.numeric(cumulative))) +
+  scale_fill_gradient(low = &quot;navy&quot;, high = &quot;lightskyblue3&quot;)   +   
+  labs(subtitle = &quot;Date: {frame_time}&quot;, fill = &quot;abc&quot;) +  
+  theme_void() +
+  theme(legend.position = c(0.15, .15))
+gifAnim &lt;- gifAnim + transition_time(sellDay)
+loop &lt;- animate(
+    gifAnim,
+    fps = 10,           # 10 frames per second
+    nframes = 70,  # animate with 1 frame each day
+    end_pause = 10,      # hold still for last 30 frames (3 secs)
+    renderer = gifski_renderer(&quot;USCumul.gif&quot;)
+)</code></pre>
+</blockquote>
+<p>It effectively uses the package {urbnmapr} to get the sf (simple features) outline of the US, and identify state names. To plot the map, ggplot was used to fill the sf based on the cumulative sales ampunt, using date as a frame (70 days). Using {gifski}, the animated map was exported as a gif.</p>
+<p>The second way to export the map, which is more interactive, was with the {plotly} package. The code for that is</p>
+<blockquote>
+<pre><code>
+USMAP &lt;- plotTable %&gt;% 
+  plot_ly(
+    type = &#39;choropleth&#39;,
+    locations= ~statesOver,
+    locationmode = &#39;USA-states&#39; , 
+    colorscale=&#39;tempo&#39;, z=~logSold,
+    zmin=0, zmax=6,
+    text=~cumulative,
+    hoverinfo=&#39;text&#39;,
+    showscale=FALSE,
+    frame=~day) %&gt;% 
+  layout(geo=list( scope = &#39;usa&#39; )) 
+library(htmlwidgets)
+saveWidget(USMAP, &quot;USMAP.html&quot;, selfcontained = F, libdir = &quot;lib&quot;)</code></pre>
+</blockquote>
+<p>This code creates a plot_ly object called USMAP. It is a choropleth map with the <code>statesOver</code> column of plotTable as the state indicator. Its scale is preset to envelope all of the possible logSold values in plotTable. The package {htmlwidgets} is used to save it as a widget that has been embedded into this website (see “map” tab).</p>
+<p>The second plot that I made was more for exploratory analysis. I wanted to see if there was a correlation between the number of signs sold to a state per 1000 people and the median income in a state. I made an accompanying scatterplot with the code</p>
+<blockquote>
+<pre><code>CumulUS %&gt;% 
+  ggplot(mapping=aes(x=medincome, y=soldPerCapita)) + 
+  geom_point(color=&quot;blue&quot;)+
+  geom_quantile(color=&quot;black&quot;)+
+  labs(x=&quot;State Median Income($)&quot;, y=&quot;Signs Sold Per 1000 Capita&quot;)+
+  theme(panel.background = element_rect(fill=&quot;#FFFFE0&quot;),
+        panel.grid.major = element_line(color=&quot;grey&quot;))</code></pre>
+</blockquote>
+<p>I used a standard ggplot(), but changed the colors of the graph to make it fit a theme with blue and yellow, like the signs that I sold.</p>
+<h1 id="write-r-programs-for-simulations-from-probabbility-models-and-randomization-based-experiments.">Write R programs for simulations from probabbility models and randomization-based experiments.</h1>
+<p>There are two different probability models I would like to showcase. The first one is a simple correlation procedure done for this project. It accompanies the scatterplot above, and is performed using the code</p>
+<blockquote>
+<pre><code>
+cor.test(CumulUS$medincome, CumulUS$soldPerCapita, method=c(&quot;pearson&quot;, &quot;kendall&quot;, &quot;spearman&quot;))</code></pre>
+</blockquote>
+<p>This tests the probability that the variables are not correlated given the sample. It was concluded that they are correlated.</p>
+<p>The second is more complicated, part of a project I am working on in CIS 661. I won’t go too in-depth about the project, just give enough context. We are investigating how physical contact contracted diseases such as Hep A are transmitted on bikes. Code was written to make a sample of the difference between case loads depending on cleaning procedures of the Citi Bike system in NYC. The code below was a way to bootstrap this sample to generalize the difference to any month of the year based on June 2013 data. 1000 samples of 330 (population size) were taken and quantiles were used as a 90% confidence interval.</p>
+<blockquote>
+<pre><code>library(infer)
+set.seed(661)
+many_diff &lt;- replicate(1000, sample(diffTable$difference, size=nrow(diffTable), replace=TRUE), simplify=FALSE)
+meansDiff &lt;- map_dbl(many_diff, mean)
+
+quantile(meansDiff, probs=c(0.05, 0.95))</code></pre>
+</blockquote>
+<h1 id="use-source-documentation-and-other-resources-to-troubleshoot-and-extend-r-programs.">Use source documentation and other resources to troubleshoot and extend R programs.</h1>
+<p>I have used source documentation for a lot of work this semester, both through google and the ?function in the console. I have found and used several packages not covered in this course, such as {tidycensus}, {plotly}, and more, as detailed in previous sections. I would like to point to my completion of the RShiny Modules to exhibit my ability to identify and correct common errors in R programs.</p>
+<p>My ability to use github can be seen not only in day to day use (fork, copy, etc), but also in its use in my CIS 661 class as collaboration. My group partner and I have used it to keep our r code up to date, as well as to communicate. I have also used issues extensively in this course.</p>
+<h1 id="write-clear-efficient-and-well-documented-r-programs.">Write clear, efficient, and well-documented R programs.</h1>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r distill-force-highlighting-css"><code class="sourceCode r"></code></pre></div>
 <!--radix_placeholder_article_footer-->
 <!--/radix_placeholder_article_footer-->
 </div>

@@ -1,8 +1,175 @@
 ---
-title: "About this site"
+title: "Learning Objectives"
 description: |
-  Some additional details about the website
+  How this project meets the learning objectives
 ---
+# Import, manage, and clean data
+This project imports data from several sources. The first comes from the .csv file that was downloaded from Etsy. The code for that is
+
+> ```
+> 
+> FinalEtsy <- read_csv('~/STA 518/ETSY2021/FinalEtsy.csv).
+> ```
+
+The second way that data is inputted in this project is using the {tidycensus} package.
+
+> ```
+> 
+> library(tidycensus)
+> readRenviron("~/.Renviron")
+> stateIncome <- get_acs(geography = "state", 
+>               variables = c(medincome = "B19013_001"), 
+>               year = 2018)
+> 
+> statePop <- get_acs(geography = "state", 
+>               variables = c(population = "B01003_001"), 
+>               year = 2018)
+> ```
+
+The original Etsy dataset came with each observation being one sale, which made mapping it a challenge. A large amount of data manipulation went into creating a cumulative sale map. I started by creating an "empty" data frame, including a row for each day and state. 
+
+> ```
+> 
+> statesOver=c()
+> sellDay=c()
+> start <- as.Date("07-31-21",format="%m-%d-%y")
+> end   <- as.Date("10-08-21",format="%m-%d-%y")
+> 
+> theDate <- start
+> theDate
+> for(state in stateList){
+>   while (theDate <= end)
+>   {
+>     statesOver <- c(statesOver, state)
+>     sellDay <- c(sellDay, as_date(theDate))
+>     theDate <- theDate + 1                    
+>   }
+>   theDate <- start
+> }
+> sellDay <- as.Date(as.POSIXct(sellDay*24*60*60, origin = "1970-01-01", tz="UTC"))
+> 
+> emptyTable <- data.frame(sellDay, statesOver)
+> ```
+
+This allowed me to left_join my edited Etsy table called NoDup, which consisted of a sum of signs sold to each state on each given day. For example, if there were 3 orders to Oregon and 1 order to Michigan on August 15, NoDup had two rows for August 15, one for each state. This is different from the original file which would have had 4 rows for that date.
+
+> ```
+> 
+> fullTable <- left_join(emptyTable, NoDup, by=c("sellDay"="date", "statesOver"="state"))
+> ```
+
+The data table fullTable then was changed with a cumulative sum, so each state sign total was filled in. A new data frame called plotTable was then created with several different way to plot the cumulative total, and logSold was decided on.
+
+> ```
+> 
+> plotTable <- fullTable %>% 
+>   mutate(numSold = ifelse(cumulative==0, 0,
+>                     ifelse(cumulative<5, 1,
+>                     ifelse(cumulative<10, 2,
+>                     ifelse(cumulative<20, 3,
+>                     ifelse(cumulative<50, 4,
+>                     ifelse(cumulative<100, 5,
+>                     ifelse(cumulative<200, 6, 7)))))))) %>% 
+>   mutate(logSold=ifelse(cumulative>0, log(cumulative+1), 0)) %>% 
+>   mutate(day = (month(sellDay)*100+day(sellDay)) )
+>   ```
+
+# Create graphical displays and numerical summaries of data for exploratory analysis and presentations.
+
+The cumulative sales map was created two ways, gif and html products. The code for the gif is
+
+> ```
+> 
+> #creates a cumulative gif
+> gifAnim <- right_join(get_urbn_map(map = "states", sf = TRUE),
+>                           plotTable,
+>                           by = c("state_abbv" = "statesOver"))
+> gifAnim <- gifAnim %>% 
+>   ggplot() +
+>   geom_sf(aes(fill = as.numeric(cumulative))) +
+>   scale_fill_gradient(low = "navy", high = "lightskyblue3")   +   
+>   labs(subtitle = "Date: {frame_time}", fill = "abc") +  
+>   theme_void() +
+>   theme(legend.position = c(0.15, .15))
+> gifAnim <- gifAnim + transition_time(sellDay)
+> loop <- animate(
+>     gifAnim,
+>     fps = 10,           # 10 frames per second
+>     nframes = 70,  # animate with 1 frame each day
+>     end_pause = 10,      # hold still for last 30 frames (3 secs)
+>     renderer = gifski_renderer("USCumul.gif")
+> )
+> ```
+
+It effectively uses the package {urbnmapr} to get the sf (simple features) outline of the US, and identify state names. To plot the map, ggplot was used to fill the sf based on the cumulative sales ampunt, using date as a frame (70 days). Using {gifski}, the animated map was exported as a gif.
+
+The second way to export the map, which is more interactive, was with the {plotly} package. The code for that is
+
+> ```
+> 
+> USMAP <- plotTable %>% 
+>   plot_ly(
+>     type = 'choropleth',
+>     locations= ~statesOver,
+>     locationmode = 'USA-states' , 
+>     colorscale='tempo', z=~logSold,
+>     zmin=0, zmax=6,
+>     text=~cumulative,
+>     hoverinfo='text',
+>     showscale=FALSE,
+>     frame=~day) %>% 
+>   layout(geo=list( scope = 'usa' )) 
+> library(htmlwidgets)
+> saveWidget(USMAP, "USMAP.html", selfcontained = F, libdir = "lib")
+> ```
+
+This code creates a plot_ly object called USMAP. It is a choropleth map with the `statesOver` column of plotTable as the state indicator. Its scale is preset to envelope all of the possible logSold values in plotTable. The package {htmlwidgets} is used to save it as a widget that has been embedded into this website (see "map" tab).
+
+The second plot that I made was more for exploratory analysis. I wanted to see if there was a correlation between the number of signs sold to a state per 1000 people and the median income in a state. I made an accompanying scatterplot with the code 
+
+> ```
+> CumulUS %>% 
+>   ggplot(mapping=aes(x=medincome, y=soldPerCapita)) + 
+>   geom_point(color="blue")+
+>   geom_quantile(color="black")+
+>   labs(x="State Median Income($)", y="Signs Sold Per 1000 Capita")+
+>   theme(panel.background = element_rect(fill="#FFFFE0"),
+>         panel.grid.major = element_line(color="grey"))
+> ```
+
+I used a standard ggplot(), but changed the colors of the graph to make it fit a theme with blue and yellow, like the signs that I sold.
+
+# Write R programs for simulations from probabbility models and randomization-based experiments.
+
+There are two different probability models I would like to showcase. The first one is a simple correlation procedure done for this project. It accompanies the scatterplot above, and is performed using the code 
+
+> ```
+> 
+> cor.test(CumulUS$medincome, CumulUS$soldPerCapita, method=c("pearson", "kendall", "spearman"))
+> ```
+
+This tests the probability that the variables are not correlated given the sample. It was concluded that they are correlated.
+
+The second is more complicated, part of a project I am working on in CIS 661. I won't go too in-depth about the project, just give enough context. We are investigating how physical contact contracted diseases such as Hep A are transmitted on bikes. Code was written to make a sample of the difference between case loads depending on cleaning procedures of the Citi Bike system in NYC. The code below was a way to bootstrap this sample to generalize the difference to any month of the year based on June 2013 data. 1000 samples of 330 (population size) were taken and quantiles were used as a 90% confidence interval.
+
+> ```
+> library(infer)
+> set.seed(661)
+> many_diff <- replicate(1000, sample(diffTable$difference, size=nrow(diffTable), replace=TRUE), simplify=FALSE)
+> meansDiff <- map_dbl(many_diff, mean)
+> 
+> quantile(meansDiff, probs=c(0.05, 0.95))
+> ```
+
+# Use source documentation and other resources to troubleshoot and extend R programs.
+
+I have used source documentation for a lot of work this semester, both through google and the ?function in the console. I have found and used several packages not covered in this course, such as {tidycensus}, {plotly}, and more, as detailed in previous sections. I would like to point to my completion of the RShiny Modules to exhibit my ability to identify and correct common errors in R programs.
+
+My ability to use github can be seen not only in day to day use (fork, copy, etc), but also in its use in my CIS 661 class as collaboration. My group partner and I have used it to keep our r code up to date, as well as to communicate. I have also used issues extensively in this course.
+
+# Write clear, efficient, and well-documented R programs.
+
+
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
