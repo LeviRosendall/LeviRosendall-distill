@@ -2065,10 +2065,18 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
 </div>
 <div class="nav-right">
 <a href="index.html">Home</a>
-<a href="about.html">About</a>
-<a href="project.html">Project</a>
-<a href="MapEmbed.html">Map</a>
-<a href="EtsyMap.html">Map Code</a>
+<a href="about.html">Course Objectives</a>
+<div class="nav-dropdown">
+<button class="nav-dropbtn">
+Map
+ 
+<span class="down-arrow">&#x25BE;</span>
+</button>
+<div class="nav-dropdown-content">
+<a href="MapEmbed.html">Interactive Map</a>
+<a href="EtsyMap.html">Code</a>
+</div>
+</div>
 <a href="IncomeCorrelation.html">Income Correlation</a>
 <a href="javascript:void(0);" class="nav-toggle">&#9776;</a>
 </div>
@@ -2223,6 +2231,13 @@ quantile(meansDiff, probs=c(0.05, 0.95))</code></pre>
 <p>I have used source documentation for a lot of work this semester, both through google and the ?function in the console. I have found and used several packages not covered in this course, such as {tidycensus}, {plotly}, and more, as detailed in previous sections. I would like to point to my completion of the RShiny Modules to exhibit my ability to identify and correct common errors in R programs.</p>
 <p>My ability to use github can be seen not only in day to day use (fork, copy, etc), but also in its use in my CIS 661 class as collaboration. My group partner and I have used it to keep our r code up to date, as well as to communicate. I have also used issues extensively in this course.</p>
 <h1 id="write-clear-efficient-and-well-documented-r-programs.">Write clear, efficient, and well-documented R programs.</h1>
+<p>I have used github as my workflow, saving all of my code to the cloud so that it is easily accessible to me and others. This allows for seamless workflow for me, and also for others to suggest changes to my code.</p>
+<p>I think that this page documents my ability to write professional reports in R Markdown. This entire website was made in R, being exported in html to this website using the {distill} package.</p>
+<p>Finally, I have written clear comments throughout my code to help me go back through at a later date, as well as to allow others to view my code and know what is going on. Below is an example of a comment.</p>
+<blockquote>
+<p>#Gets median income by state <br /> #decided to use this API because the uploaded dataset was for zip codes <br /> #originally planned on doing zipcodes, but there wasnt enough data for that to be feasible</p>
+</blockquote>
+<p>This comment not only describes what happens in that code block, but also explains what was tried first to get to this point. I had originally tried to do a more focused look at sales by zipcode, but a lack in data required me to do a more broad pictured sales by state analysis.</p>
 <div class="sourceCode" id="cb11"><pre class="sourceCode r distill-force-highlighting-css"><code class="sourceCode r"></code></pre></div>
 <!--radix_placeholder_article_footer-->
 <!--/radix_placeholder_article_footer-->

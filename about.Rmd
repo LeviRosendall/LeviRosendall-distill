@@ -169,6 +169,17 @@ My ability to use github can be seen not only in day to day use (fork, copy, etc
 
 # Write clear, efficient, and well-documented R programs.
 
+I have used github as my workflow, saving all of my code to the cloud so that it is easily accessible to me and others. This allows for seamless workflow for me, and also for others to suggest changes to my code.
+
+I think that this page documents my ability to write professional reports in R Markdown. This entire website was made in R, being exported in html to this website using the {distill} package.
+
+Finally, I have written clear comments throughout my code to help me go back through at a later date, as well as to allow others to view my code and know what is going on. Below is an example of a comment.
+
+> #Gets median income by state <br />
+> #decided to use this API because the uploaded dataset was for zip codes <br />
+> #originally planned on doing zipcodes, but there wasnt enough data for that to be feasible
+
+This comment not only describes what happens in that code block, but also explains what was tried first to get to this point. I had originally tried to do a more focused look at sales by zipcode, but a lack in data required me to do a more broad pictured sales by state analysis. 
 
 
 ```{r setup, include=FALSE}

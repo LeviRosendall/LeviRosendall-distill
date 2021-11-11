@@ -13,9 +13,12 @@ This is an R Markdown document. Markdown is a simple formatting syntax for autho
 When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
 
 ```{r}
+#loads necessary libraries
 library(readxl)
 library(tidyverse)
 library(urbnmapr)
+
+#loads two datasets, one from Etsy, one from online census data
 CensusData <- read_excel('~/STA 518/ETSY2021/Census Data.xlsx')
 FinalEtsy <- read_csv('~/STA 518/ETSY2021/FinalEtsy.csv')
 ```
@@ -28,6 +31,8 @@ US_ETSY2021 <- FinalEtsy %>%
 
 ```{r}
 #Gets median income by state
+#decided to use this API because the uploaded dataset was for zip codes
+#originally planned on doing zipcodes, but there wasnt enough data for that to be feasible
 library(tidycensus)
 #census_api_key("74dffda41385b000bbc7c51fcc2b32468769dce9", install=TRUE)
 readRenviron("~/.Renviron")
@@ -45,26 +50,32 @@ v17 <- load_variables(2018, "acs5", cache = TRUE)
 ```
 
 ```{r joinSalary}
+#gets a sum of items sold for each state
 CumulUS <- US_ETSY2021 %>% 
   group_by(`Ship State`) %>% 
   summarise(soldToState=sum(`Number of Items`))
 
+#uses the urbnmapr package to get a list of states and abbreviations, manually added Puerto Rico
 stateListAbbv <- get_urbn_map(map = "states") %>% 
   select(state_abbv, state_name) %>% 
   distinct() %>% 
   rbind(c("PR", "Puerto Rico"))
 
+#Joined my two datasets to get state names in from urbnmapr
 CumulUS <- left_join(CumulUS, stateListAbbv, by=c("Ship State"="state_abbv"))
 
+#joined that dataset with the stateIncome dataset from the census api, by the state_name
 CumulUS <- left_join(CumulUS, stateIncome, by=c("state_name"="NAME")) %>% 
   select(soldToState, state_name, medincome=estimate)
 
+#joined dataset with the statePop dataset to make a new variable of soldPerCapita, standardizing the number of items sold in each state
 CumulUS <- left_join(CumulUS, statePop, by=c("state_name"="NAME")) %>% 
   select(soldToState, state_name, medincome, population=estimate) %>% 
   mutate(soldPerCapita=1000*soldToState/population)
 ```
 
 ```{r correlationTest}
+#creates a scatterplot with quantiles for visualizing the correlation
 CumulUS %>% 
   ggplot(mapping=aes(x=medincome, y=soldPerCapita)) + 
   geom_point(color="blue")+
@@ -72,6 +83,8 @@ CumulUS %>%
   labs(x="State Median Income($)", y="Signs Sold Per 1000 Capita")+
   theme(panel.background = element_rect(fill="#FFFFE0"),
         panel.grid.major = element_line(color="grey"))
+
+#performs correlation test
 cor.test(CumulUS$medincome, CumulUS$soldPerCapita, method=c("pearson", "kendall", "spearman"))
 ```
 
