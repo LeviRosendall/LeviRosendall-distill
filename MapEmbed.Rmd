@@ -1,0 +1,18 @@
+---
+title: "Etsy Interactive Sales Map"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r echo=FALSE}
+htmltools::tags$iframe(
+  width = "1024",
+  height = "768",
+  src = "USMAP.html", 
+  scrolling = "no", 
+  seamless = "seamless",
+  frameBorder = "0"#,
+  #style="-webkit-transform:scale(0.5);-moz-transform-scale(0.5);"
+)

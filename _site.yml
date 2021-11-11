@@ -12,7 +12,7 @@ navbar:
     - text: "Project"
       href: project.html
     - text: "Map"
-      href: USMAP.html
+      href: MapEmbed.html
     - text: "Map Code"
       href: EtsyMap.html
     - text: "Income Correlation"
