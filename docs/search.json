@@ -38,6 +38,13 @@
       "last_modified": "2021-11-11T13:52:27+00:00"
     },
     {
+      "path": "Presentation.html",
+      "title": "Presentation",
+      "author": [],
+      "contents": "\n\n\n      Levi\n      \n      \n      Home\n      Course Objectives\n      \n      \n      Map\n       \n      ▾\n      \n      \n      Interactive Map\n      Code\n      \n      \n      Income Correlation\n      ☰\n      \n      In the morningGetting upTurn off alarm\nGet out of bed\nBreakfastEat eggs\nDrink coffee\nIn the eveningDinnerEat spaghetti\nDrink wine\n\n\n\nA scatterplot.\n\n\n\nGoing to sleepGet in bed\nCount sheep\n\n  (function () {\n    var script = document.createElement(\"script\");\n    script.type = \"text/javascript\";\n    script.src  = \"https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML\";\n    document.getElementsByTagName(\"head\")[0].appendChild(script);\n  })();\n\n  (function() {\n    if (window.jQuery) {\n       window.jQuery(document).on('slideleave', function(e) {\n         window.jQuery(e.target).trigger('hidden');\n      });\n       window.jQuery(document).on('slideenter', function(e) {\n         window.jQuery(e.target).trigger('shown');\n      });\n    }\n  })();\n",
+      "last_modified": "2021-11-15T23:37:10+00:00"
+    },
+    {
       "path": "project.html",
       "title": "Project",
       "author": [],

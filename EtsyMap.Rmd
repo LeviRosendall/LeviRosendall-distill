@@ -118,7 +118,8 @@ plotTable <- fullTable %>%
   mutate(logSold=ifelse(cumulative>0, log(cumulative+1), 0)) %>% 
   mutate(day = (month(sellDay)*100+day(sellDay)) )
 
-
+#only needed once
+#write_csv(plotTable, here::here("plotTable.csv"))
 
 
 ```

@@ -1,5 +1,5 @@
 ---
-title: "IncomeCorrelation"
+title: "Income Correlation"
 ---
 
 ```{r setup, include=FALSE}
