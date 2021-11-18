@@ -18,32 +18,28 @@ library(plotly)
 
 # Load data --------------------------------------------------------------------
 
-plotTable <- read_csv(here::here("ShinyMap/plotTable.csv"))
+plotTable <- read_csv("plotTable.csv")
 plotTable
 
 # Define UI --------------------------------------------------------------------
 
 ui <- fluidPage(
     br(),
-    
-    sidebarLayout(
-        sidebarPanel(
+        
+        mainPanel(
             dateRangeInput("daterange3", "Date range:",
                            start  = "2021-07-31",
                            end    = "2021-10-08",
                            min    = "2021-07-31",
                            max    = "2021-10-08",
                            format = "mm/dd/yy",
-                           separator = " - ")
-            
-        ),
-        
-        mainPanel(
-            plotlyOutput(outputId = "map")
+                           separator = " - ",
+                           width = 750),
+            plotlyOutput(outputId = "map", width = 750)
            
         )
     )
-)
+
 
 # Define server ----------------------------------------------------------------
 
@@ -64,7 +60,8 @@ server <- function(input, output, session) {
             summarise(sellDay, statesOver, items, newCumulative = cumsum(items))
         
         fullTable <- fullTable %>% 
-            mutate(logSold=ifelse(newCumulative>0, log(newCumulative+1), 0))
+            mutate(logSold=ifelse(newCumulative>0, log(newCumulative+1), 0)) %>% 
+            mutate(Date = sellDay)
         
         USMAP <- fullTable %>% 
             filter(sellDay >= input$daterange3[1]) %>% 
@@ -77,7 +74,7 @@ server <- function(input, output, session) {
                 text=~newCumulative,
                 hoverinfo='text',
                 showscale=FALSE,
-                frame=~as.Date(sellDay)) %>% 
+                frame=~Date) %>% 
             layout(geo=list( scope = 'usa' )) 
         
        
