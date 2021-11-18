@@ -97,7 +97,7 @@ emptyTable <- data.frame(sellDay, statesOver)
 #left_joins emptyTable and the population data from NoDup
 fullTable <- left_join(emptyTable, NoDup, by=c("sellDay"="date", "statesOver"="state"))
 
-#makes a new items variable, replacine NA in Total_Sold with 0
+#makes a new items variable, replacing NA in Total_Sold with 0
 #group_by statesOver and adds a cumulative sum by state
 fullTable <- fullTable %>% 
   mutate(items=ifelse(is.na(Total_Sold), 0,Total_Sold)) %>% 
@@ -136,7 +136,7 @@ USMAP <- plotTable %>%
     text=~cumulative,
     hoverinfo='text',
     showscale=FALSE,
-    frame=~day) %>% 
+    frame=~as.Date(sellDay)) %>% 
   layout(geo=list( scope = 'usa' )) 
 
 #saves the above 
