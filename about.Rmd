@@ -3,6 +3,9 @@ title: "Learning Objectives"
 description: |
   How this project meets the learning objectives
 ---
+# Github link
+https://github.com/LeviRosendall/LeviRosendall-distill
+
 # Import, manage, and clean data
 This project imports data from several sources. The first comes from the .csv file that was downloaded from Etsy. The code for that is
 
