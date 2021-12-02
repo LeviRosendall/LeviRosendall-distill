@@ -2,6 +2,12 @@
 title: "Etsy Interactive Sales Map"
 ---
 
+## Activities
+
+1. Find what day/week/month had the highest sales volume
+2. See how many signs were shipped to your state
+3. See how many signs were sold each Friday (The day that Ted Lasso Episodes are released.)
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
@@ -19,6 +25,7 @@ library(plotly)
 tags$iframe(src ="https://levirosendall.shinyapps.io/shinymap/", height=600, width=750, style="border:none;")
 
 ```
+
 
 
 

@@ -1,18 +1,13 @@
 ---
-title: "Income Correlation Conclusions"
+title: "Income Correlation Code"
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-# Overview
 
-An overarching theme for our classes project focused on diversity. For that reason, I wanted to try to see if there was any bias present in my online store, specifically income bias. To do that, I used {tidycensus} to gain median income and population for each state. Using state population, I created a variable for signs sold per capita in each state. Plotting this against the median income of a state with lower and upper quartiles suggested that the higher the income of a state, the more signs were sold. 
-
-This led me to perform a correlation test. I chose this over regression because I was simply interested in the relationship, not predicting how many signs would be sold over time. This correlation test confirmed my suspicions, revealing that there was a moderately strong positive correlation between the two variables with a p-value smaller than 0.0001.
-
-```{r, echo=FALSE}
+```{r}
 #loads necessary libraries
 library(readxl)
 library(tidyverse)
@@ -23,13 +18,13 @@ CensusData <- read_excel('~/STA 518/ETSY2021/Census Data.xlsx')
 FinalEtsy <- read_csv('~/STA 518/ETSY2021/FinalEtsy.csv')
 ```
 
-```{r, echo=FALSE}
+```{r}
 #Creates a dataset of only US orders
 US_ETSY2021 <- FinalEtsy %>% 
   filter(`Ship Country`=="United States")
 ```
 
-```{r, echo=FALSE}
+```{r}
 #Gets median income by state
 #decided to use this API because the uploaded dataset was for zip codes
 #originally planned on doing zipcodes, but there wasnt enough data for that to be feasible
@@ -49,7 +44,7 @@ v17 <- load_variables(2018, "acs5", cache = TRUE)
 #View(v17)
 ```
 
-```{r joinSalary, echo=FALSE}
+```{r joinSalary}
 #gets a sum of items sold for each state
 CumulUS <- US_ETSY2021 %>% 
   group_by(`Ship State`) %>% 
@@ -74,7 +69,7 @@ CumulUS <- left_join(CumulUS, statePop, by=c("state_name"="NAME")) %>%
   mutate(soldPerCapita=1000*soldToState/population)
 ```
 
-```{r correlationTest, echo=FALSE}
+```{r correlationTest}
 #creates a scatterplot with quantiles for visualizing the correlation
 CumulUS %>% 
   ggplot(mapping=aes(x=medincome, y=soldPerCapita)) + 

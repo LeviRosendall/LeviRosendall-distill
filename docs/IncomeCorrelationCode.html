@@ -86,26 +86,26 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
 </style>
 
   <!--radix_placeholder_meta_tags-->
-  <title>Levi: Etsy Interactive Sales Map</title>
+  <title>Levi: Income Correlation Code</title>
 
 
 
 
   <!--  https://developers.facebook.com/docs/sharing/webmasters#markup -->
-  <meta property="og:title" content="Levi: Etsy Interactive Sales Map"/>
+  <meta property="og:title" content="Levi: Income Correlation Code"/>
   <meta property="og:type" content="article"/>
   <meta property="og:locale" content="en_US"/>
   <meta property="og:site_name" content="Levi"/>
 
   <!--  https://dev.twitter.com/cards/types/summary -->
   <meta property="twitter:card" content="summary"/>
-  <meta property="twitter:title" content="Levi: Etsy Interactive Sales Map"/>
+  <meta property="twitter:title" content="Levi: Income Correlation Code"/>
 
   <!--/radix_placeholder_meta_tags-->
   <!--radix_placeholder_rmarkdown_metadata-->
 
   <script type="text/json" id="radix-rmarkdown-metadata">
-  {"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["title"]}},"value":[{"type":"character","attributes":{},"value":["Etsy Interactive Sales Map"]}]}
+  {"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["title"]}},"value":[{"type":"character","attributes":{},"value":["Income Correlation Code"]}]}
   </script>
   <!--/radix_placeholder_rmarkdown_metadata-->
   <!--radix_placeholder_navigation_in_header-->
@@ -2050,7 +2050,7 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
 <!--radix_placeholder_front_matter-->
 
 <script id="distill-front-matter" type="text/json">
-{"title":"Etsy Interactive Sales Map","authors":[]}
+{"title":"Income Correlation Code","authors":[]}
 </script>
 
 <!--/radix_placeholder_front_matter-->
@@ -2094,7 +2094,7 @@ Income Correlation
 <!--/radix_placeholder_site_before_body-->
 
 <div class="d-title">
-<h1>Etsy Interactive Sales Map</h1>
+<h1>Income Correlation Code</h1>
 <!--radix_placeholder_categories-->
 <!--/radix_placeholder_categories-->
 
@@ -2102,19 +2102,107 @@ Income Correlation
 
 
 <div class="d-article">
-<h2 id="activities">Activities</h2>
-<ol type="1">
-<li>Find what day/week/month had the highest sales volume</li>
-<li>See how many signs were shipped to your state</li>
-<li>See how many signs were sold each Friday (The day that Ted Lasso Episodes are released.)</li>
-</ol>
 <div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='co'>#loads necessary libraries</span>
+<span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://readxl.tidyverse.org'>readxl</a></span><span class='op'>)</span>
+<span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://tidyverse.tidyverse.org'>tidyverse</a></span><span class='op'>)</span>
+<span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://github.com/UrbanInstitute/urbnmapr'>urbnmapr</a></span><span class='op'>)</span>
 
+<span class='co'>#loads two datasets, one from Etsy, one from online census data</span>
+<span class='va'>CensusData</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://readxl.tidyverse.org/reference/read_excel.html'>read_excel</a></span><span class='op'>(</span><span class='st'>'~/STA 518/ETSY2021/Census Data.xlsx'</span><span class='op'>)</span>
+<span class='va'>FinalEtsy</span> <span class='op'>&lt;-</span> <span class='fu'>read_csv</span><span class='op'>(</span><span class='st'>'~/STA 518/ETSY2021/FinalEtsy.csv'</span><span class='op'>)</span>
+</code></pre>
 </div>
-<div class="layout-chunk" data-layout="l-body-outset">
-<p><iframe src="https://levirosendall.shinyapps.io/shinymap/" height="600" width="750" style="border:none;"></iframe></p>
 </div>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r distill-force-highlighting-css"><code class="sourceCode r"></code></pre></div>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='co'>#Creates a dataset of only US orders</span>
+<span class='va'>US_ETSY2021</span> <span class='op'>&lt;-</span> <span class='va'>FinalEtsy</span> <span class='op'>%&gt;%</span> 
+  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/filter.html'>filter</a></span><span class='op'>(</span><span class='va'>`Ship Country`</span><span class='op'>==</span><span class='st'>"United States"</span><span class='op'>)</span>
+</code></pre>
+</div>
+</div>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='co'>#Gets median income by state</span>
+<span class='co'>#decided to use this API because the uploaded dataset was for zip codes</span>
+<span class='co'>#originally planned on doing zipcodes, but there wasnt enough data for that to be feasible</span>
+<span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://walker-data.com/tidycensus/'>tidycensus</a></span><span class='op'>)</span>
+<span class='co'>#census_api_key("74dffda41385b000bbc7c51fcc2b32468769dce9", install=TRUE)</span>
+<span class='fu'><a href='https://rdrr.io/r/base/readRenviron.html'>readRenviron</a></span><span class='op'>(</span><span class='st'>"~/.Renviron"</span><span class='op'>)</span>
+<span class='va'>stateIncome</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://walker-data.com/tidycensus/reference/get_acs.html'>get_acs</a></span><span class='op'>(</span>geography <span class='op'>=</span> <span class='st'>"state"</span>, 
+              variables <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span>medincome <span class='op'>=</span> <span class='st'>"B19013_001"</span><span class='op'>)</span>, 
+              year <span class='op'>=</span> <span class='fl'>2018</span><span class='op'>)</span>
+
+<span class='va'>statePop</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://walker-data.com/tidycensus/reference/get_acs.html'>get_acs</a></span><span class='op'>(</span>geography <span class='op'>=</span> <span class='st'>"state"</span>, 
+              variables <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span>population <span class='op'>=</span> <span class='st'>"B01003_001"</span><span class='op'>)</span>, 
+              year <span class='op'>=</span> <span class='fl'>2018</span><span class='op'>)</span>
+
+<span class='va'>v17</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://walker-data.com/tidycensus/reference/load_variables.html'>load_variables</a></span><span class='op'>(</span><span class='fl'>2018</span>, <span class='st'>"acs5"</span>, cache <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
+
+<span class='co'>#View(v17)</span>
+</code></pre>
+</div>
+</div>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='co'>#gets a sum of items sold for each state</span>
+<span class='va'>CumulUS</span> <span class='op'>&lt;-</span> <span class='va'>US_ETSY2021</span> <span class='op'>%&gt;%</span> 
+  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/group_by.html'>group_by</a></span><span class='op'>(</span><span class='va'>`Ship State`</span><span class='op'>)</span> <span class='op'>%&gt;%</span> 
+  <span class='fu'><a href='https://r-spatial.github.io/sf/reference/tidyverse.html'>summarise</a></span><span class='op'>(</span>soldToState<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/sum.html'>sum</a></span><span class='op'>(</span><span class='va'>`Number of Items`</span><span class='op'>)</span><span class='op'>)</span>
+
+<span class='co'>#uses the urbnmapr package to get a list of states and abbreviations, manually added Puerto Rico</span>
+<span class='va'>stateListAbbv</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/urbnmapr/man/get_urbn_map.html'>get_urbn_map</a></span><span class='op'>(</span>map <span class='op'>=</span> <span class='st'>"states"</span><span class='op'>)</span> <span class='op'>%&gt;%</span> 
+  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/select.html'>select</a></span><span class='op'>(</span><span class='va'>state_abbv</span>, <span class='va'>state_name</span><span class='op'>)</span> <span class='op'>%&gt;%</span> 
+  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/distinct.html'>distinct</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>%&gt;%</span> 
+  <span class='fu'><a href='https://rdrr.io/r/base/cbind.html'>rbind</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"PR"</span>, <span class='st'>"Puerto Rico"</span><span class='op'>)</span><span class='op'>)</span>
+
+<span class='co'>#Joined my two datasets to get state names in from urbnmapr</span>
+<span class='va'>CumulUS</span> <span class='op'>&lt;-</span> <span class='fu'>left_join</span><span class='op'>(</span><span class='va'>CumulUS</span>, <span class='va'>stateListAbbv</span>, by<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"Ship State"</span><span class='op'>=</span><span class='st'>"state_abbv"</span><span class='op'>)</span><span class='op'>)</span>
+
+<span class='co'>#joined that dataset with the stateIncome dataset from the census api, by the state_name</span>
+<span class='va'>CumulUS</span> <span class='op'>&lt;-</span> <span class='fu'>left_join</span><span class='op'>(</span><span class='va'>CumulUS</span>, <span class='va'>stateIncome</span>, by<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"state_name"</span><span class='op'>=</span><span class='st'>"NAME"</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>%&gt;%</span> 
+  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/select.html'>select</a></span><span class='op'>(</span><span class='va'>soldToState</span>, <span class='va'>state_name</span>, medincome<span class='op'>=</span><span class='va'>estimate</span><span class='op'>)</span>
+
+<span class='co'>#joined dataset with the statePop dataset to make a new variable of soldPerCapita, standardizing the number of items sold in each state</span>
+<span class='va'>CumulUS</span> <span class='op'>&lt;-</span> <span class='fu'>left_join</span><span class='op'>(</span><span class='va'>CumulUS</span>, <span class='va'>statePop</span>, by<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"state_name"</span><span class='op'>=</span><span class='st'>"NAME"</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>%&gt;%</span> 
+  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/select.html'>select</a></span><span class='op'>(</span><span class='va'>soldToState</span>, <span class='va'>state_name</span>, <span class='va'>medincome</span>, population<span class='op'>=</span><span class='va'>estimate</span><span class='op'>)</span> <span class='op'>%&gt;%</span> 
+  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate.html'>mutate</a></span><span class='op'>(</span>soldPerCapita<span class='op'>=</span><span class='fl'>1000</span><span class='op'>*</span><span class='va'>soldToState</span><span class='op'>/</span><span class='va'>population</span><span class='op'>)</span>
+</code></pre>
+</div>
+</div>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='co'>#creates a scatterplot with quantiles for visualizing the correlation</span>
+<span class='va'>CumulUS</span> <span class='op'>%&gt;%</span> 
+  <span class='fu'>ggplot</span><span class='op'>(</span>mapping<span class='op'>=</span><span class='fu'>aes</span><span class='op'>(</span>x<span class='op'>=</span><span class='va'>medincome</span>, y<span class='op'>=</span><span class='va'>soldPerCapita</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>+</span> 
+  <span class='fu'>geom_point</span><span class='op'>(</span>color<span class='op'>=</span><span class='st'>"blue"</span><span class='op'>)</span><span class='op'>+</span>
+  <span class='fu'>geom_quantile</span><span class='op'>(</span>color<span class='op'>=</span><span class='st'>"black"</span>, quantiles <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0.25</span>, <span class='fl'>0.75</span><span class='op'>)</span><span class='op'>)</span><span class='op'>+</span>
+  <span class='fu'>labs</span><span class='op'>(</span>x<span class='op'>=</span><span class='st'>"State Median Income($)"</span>, y<span class='op'>=</span><span class='st'>"Signs Sold Per 1000 Capita"</span><span class='op'>)</span><span class='op'>+</span>
+  <span class='fu'>theme</span><span class='op'>(</span>panel.background <span class='op'>=</span> <span class='fu'>element_rect</span><span class='op'>(</span>fill<span class='op'>=</span><span class='st'>"#FFFFE0"</span><span class='op'>)</span>,
+        panel.grid.major <span class='op'>=</span> <span class='fu'>element_line</span><span class='op'>(</span>color<span class='op'>=</span><span class='st'>"grey"</span><span class='op'>)</span><span class='op'>)</span>
+</code></pre>
+</div>
+<img src="IncomeCorrelationCode_files/figure-html5/correlationTest-1.png" width="624" />
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='co'>#performs correlation test</span>
+<span class='fu'><a href='https://rdrr.io/r/stats/cor.test.html'>cor.test</a></span><span class='op'>(</span><span class='va'>CumulUS</span><span class='op'>$</span><span class='va'>medincome</span>, <span class='va'>CumulUS</span><span class='op'>$</span><span class='va'>soldPerCapita</span>, method<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"pearson"</span>, <span class='st'>"kendall"</span>, <span class='st'>"spearman"</span><span class='op'>)</span><span class='op'>)</span>
+</code></pre>
+</div>
+<pre><code>
+    Pearson&#39;s product-moment correlation
+
+data:  CumulUS$medincome and CumulUS$soldPerCapita
+t = 4.4474, df = 50, p-value = 4.854e-05
+alternative hypothesis: true correlation is not equal to 0
+95 percent confidence interval:
+ 0.3036150 0.7031413
+sample estimates:
+      cor 
+0.5324023 </code></pre>
+</div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r distill-force-highlighting-css"><code class="sourceCode r"></code></pre></div>
 <!--radix_placeholder_article_footer-->
 <!--/radix_placeholder_article_footer-->
 </div>
