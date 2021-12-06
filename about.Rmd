@@ -8,6 +8,13 @@ https://github.com/LeviRosendall/LeviRosendall-distill
 
 Due to the dataset having identifiable information, it is not included in the github repo.
 
+```{r echo=FALSE}
+library(readr)
+library(plotly)
+library(shiny)
+```
+
+
 # Import, manage, and clean data
 This project imports data from several sources. The first comes from the .csv file that was downloaded from Etsy. The code for that is
 
@@ -106,6 +113,9 @@ The cumulative sales map was created two ways, gif and html products. The code f
 > )
 > ```
 
+
+![](~/STA 518/LeviRosendall-distill/USCumul.gif)
+
 It effectively uses the package {urbnmapr} to get the sf (simple features) outline of the US, and identify state names. To plot the map, ggplot was used to fill the sf based on the cumulative sales ampunt, using date as a frame (70 days). Using {gifski}, the animated map was exported as a gif.
 
 The second way to export the map, which is more interactive, was with the {plotly} package. The code for that is
@@ -141,6 +151,12 @@ The second plot that I made was more for exploratory analysis. I wanted to see i
 >   theme(panel.background = element_rect(fill="#FFFFE0"),
 >         panel.grid.major = element_line(color="grey"))
 > ```
+
+```{r echo=FALSE, layout="l-body-outset"}
+
+tags$iframe(src ="https://rstudio.gvsu.edu/s/1f24cbceadf6e000d14b2/chunk_output/s/0B1C8227/ckbt00t38g1zs/000031.png", height=450, width=400, style="border:none;")
+```
+
 
 I used a standard ggplot(), but changed the colors of the graph to make it fit a theme with blue and yellow, like the signs that I sold.
 
