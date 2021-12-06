@@ -152,11 +152,7 @@ The second plot that I made was more for exploratory analysis. I wanted to see i
 >         panel.grid.major = element_line(color="grey"))
 > ```
 
-```{r echo=FALSE, layout="l-body-outset"}
-
-tags$iframe(src ="https://rstudio.gvsu.edu/s/1f24cbceadf6e000d14b2/chunk_output/s/0B1C8227/ckbt00t38g1zs/000031.png", height=450, width=400, style="border:none;")
-```
-
+![](~/STA 518/LeviRosendall-distill/CorrelationSTA518.png)
 
 I used a standard ggplot(), but changed the colors of the graph to make it fit a theme with blue and yellow, like the signs that I sold.
 
